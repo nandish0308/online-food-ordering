@@ -1,0 +1,20 @@
+.custom-textfield .MuiOutlinedInput-root {
+    border-color: black;
+  }
+  
+  .custom-textfield .MuiOutlinedInput-root:hover fieldset {
+    border-color: blue;
+  }
+  
+  .custom-textfield .MuiOutlinedInput-root.Mui-focused fieldset {
+    border-color: green;
+  }
+  
+  .custom-textfield .MuiInputLabel-root {
+    color: black;
+  }
+  
+  .custom-textfield .MuiInputBase-input {
+    color: red;
+  }
+  
