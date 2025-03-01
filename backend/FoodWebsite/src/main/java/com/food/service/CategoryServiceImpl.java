@@ -28,11 +28,27 @@ public class CategoryServiceImpl implements CategoryService{
         return categoryRepository.save(category);
     }
 
+//    @Override
+//    public List<Category> findCategoryByRestaurantId(Long id) throws Exception {
+//        Restaurant restaurant = restaurantService.findRestaurantById(id); // ✅ FIXED: Fetch by restaurant ID
+//        return categoryRepository.findByRestaurantId(id);
+//    }
     @Override
     public List<Category> findCategoryByRestaurantId(Long id) throws Exception {
-        Restaurant restaurant = restaurantService.getRestaurantByUserId(id);
-        return categoryRepository.findByRestaurantId(restaurant.getId());
+        System.out.println("🔍 Fetching restaurant by ID: " + id);
+
+        Restaurant restaurant = restaurantService.findRestaurantById(id);
+        if (restaurant == null) {
+            throw new Exception("❌ Restaurant not found with ID: " + id);
+        }
+
+        List<Category> categories = categoryRepository.findByRestaurantId(id);
+        System.out.println("✅ Fetched Categories: " + categories);
+
+        return categories;
     }
+
+
 
     @Override
     public Category findCategoryById(Long id) throws Exception {

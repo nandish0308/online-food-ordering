@@ -1,9 +1,11 @@
 package com.food.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,6 +15,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class Food {
 
     @Id
@@ -21,10 +24,12 @@ public class Food {
 
     private String name;
 
+
     private String description;
     private Long price;
 
     @ManyToOne
+    @JsonIgnore
     private Category foodCategory;
 
     @Column(length = 1000)
@@ -34,6 +39,7 @@ public class Food {
     private boolean available;
 
     @ManyToOne
+    @JsonIgnore  // ✅ Prevents infinite loops in JSON serialization
     private Restaurant restaurant;
 
     private boolean isVegetarian;

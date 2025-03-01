@@ -1,11 +1,13 @@
 import { Box, Button, Card, Divider , Grid, Modal, TextField } from '@mui/material'
-import React from 'react'
+import React, { useState } from 'react'
 import Cartitem from './Cartitem'
 import AddLocationIcon from '@mui/icons-material/AddLocation';
 import AddressCart from './AddressCart'
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import './Cart.css';
 import { Link, Links } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { createOrder } from '../State/Order/Action';
 // import * as Yup from 'yup';
 
 export const style = {
@@ -37,12 +39,34 @@ export const style = {
 //   })
 
 const Cart = (showButton) => {
-    const items=[1,1]
+    
     const createOrderUsingSelectedAddress=()=> {};
     const handleOpenAddressModel=()=>setOpen(true) ;
     const [open, setOpen] = React.useState(false);
+    const dispatch=useDispatch()
+    const {auth}=useSelector(store=>store)
+    const [cart] = useState({
+        cartItems: [] ,  // ✅ Ensures `items` is never null or undefined
+      });
+      
      const handleClose = () => setOpen(false);
     const handlesubmit=(values)=>{
+        const data={
+            jwt:localStorage.getItem("jwt"),
+            order:{
+                restaurantId:cart.cartItems[0].food?.restaurant.id,
+                deliveryAddress:{
+                    fullName:auth.user?.fullName,
+                    streetAddress:values.streetAddress,
+                    city:values.city,
+                    state:values.state,
+                    pincode:values.pincode,
+                    country:"india"
+                }
+            }
+        }
+       
+        dispatch(createOrder(data))
         console.log("form value",values)
     };
   
@@ -52,17 +76,19 @@ const Cart = (showButton) => {
     <>
         <main className=' text-black lg:flex justify-start'>
             <section className='lg:w-[30%] space-y-6 lg:min-h-screen pt-10'>
-           {items.map((item) =>(<Cartitem/>
+           {cart.cartItems.map((item) =>(<Cartitem item={item}/>
         ))} 
          
             <Divider className='bg-black'/> 
             <div className='billDetails px-5 text-sm'>
+            {cart?.cart ? (
+  <>
 
                 <p className='font-extralight py-5'> Bill Details</p>
                 <div className='space-y-3'>
                     <div className='flex justify-between text-black'>
                         <p>Item Total</p>
-                        <p> $81.92</p>
+                        <p>$ {cart.cart.total}</p>
                     </div>
                     <div className='flex justify-between text-black'>
                         <p>Deliver Fee</p>
@@ -81,8 +107,12 @@ const Cart = (showButton) => {
                 
                 <div className='flex justify-between text-black'>
                         <p>Total Pay</p>
-                        <p> $86.54</p>
+                        <p> ${cart.cart?.total+33+21}</p>
                     </div>
+                    </>
+) : (
+  <p>🛒 Your cart is empty.</p>
+)}
                 
 
             </div>

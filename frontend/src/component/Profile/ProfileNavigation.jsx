@@ -8,6 +8,9 @@ import EventIcon from '@mui/icons-material/Event';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { Divider , Drawer, Icon, useMediaQuery } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+
+import { logout} from '../State/Authentication/Action';
 const menu =[
     {title:"Orders",Icon:<ShoppingBagIcon/>},
     {title:"Favorites",Icon:<FavoriteIcon className='text-black'/>},
@@ -22,10 +25,16 @@ const menu =[
 const ProfileNavigation = ({open,handleClose}) => {
     const isSmallScreen=useMediaQuery("(max-width:1080)")
      const navigate=useNavigate();
-    const handleNavigate=(item)=>{
-      navigate(`/my-profile/${item.title.toLowerCase()}`)
-
-    }
+     const dispatch=useDispatch();
+     const handleNavigate = (item) => {
+      if (item.title === "Logout") {
+        dispatch(logout()); // Call the correct function
+        navigate("/");
+      } else {
+        navigate(`/my-profile/${item.title.toLowerCase()}`);
+      }
+    };
+    
   return (
     <div>
         <Drawer variant={isSmallScreen?"temporary":"permanent"}

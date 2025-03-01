@@ -2,30 +2,49 @@ import { Chip, IconButton } from '@mui/material'
 import React from 'react'
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { removeCartItem, updateCartItem } from '../State/Cart/Action';
 
-const Cartitem = () => {
+ const Cartitem = ({item}) => {
+    const {auth} = useSelector((store) => store);
+    const navigate = useNavigate();
+    const dispatch=useDispatch()
+    const jwt=localStorage.getItem("jwt");
+
+   const handleUpdateCartItem=(value)=>{
+    if (value===-1 && item.quantity===1){
+        handleRemoveCartItem({data,jwt})
+    }
+    const data={cartItemId:item.id,quantity:item.quantity+value}
+    dispatch(updateCartItem)
+   }
+   const handleRemoveCartItem=()=>{
+    dispatch(removeCartItem({cartItemId:item.id,jwt:auth.jwt || jwt}))
+   }
+  
   return (
     <div className='px-5'>
         <div className='lg:flex items-center lg:space-x-5'>
             <div>
                 <img className='w-[5rem] h-[rem] object-cover'
-                 src="https://images.pexels.com/photos/365459/pexels-photo-365459.jpeg?auto=compress&cs=tinysrgb&w=400"
+                 src={item.food.images[0]}
                   alt=''/>
             </div>
             <div className='flex items-center justify-between lg:w-[70%]'>
                 <div className='space-y-1 lg:space-y-3 w-full'>
-                    <p>Pizza</p>
+                    <p>{item.food.name}</p>
                     <div className='flex justify-between items-center'>
                         <div className='flex items-center space-x-1'>
-                            <IconButton >
+                            <IconButton onClick={()=>handleUpdateCartItem(-1)} >
                                 <RemoveCircleOutlineIcon className='text-black'/>
 
                             </IconButton>
                             <div className='w-5 h-5 text-xs flex items-center justify-center'>
-                                {5}
+                                {item.quantity}
                             </div>
 
-                            <IconButton >
+                            <IconButton onClick={()=>handleUpdateCartItem(1)}>
                                 <AddCircleOutlineIcon className='text-black' />
 
                             </IconButton>
@@ -35,7 +54,7 @@ const Cartitem = () => {
                     </div>
                 </div>
                 <p>
-                    $40.96
+                    ${item.totalPrice}
                 </p>
         
 
@@ -44,7 +63,7 @@ const Cartitem = () => {
         </div>
         <div className=' pt-3 space-x-2'>
             <div className=''>
-            {[1,1,1,].map((item) => <Chip sx={{
+            {item.ingredients.map((ingredient) => <Chip sx={{
           backgroundColor: "White", 
           // Silver background
           border:"solid black",
@@ -53,7 +72,7 @@ const Cartitem = () => {
           color: "Black", // Black text
           fontWeight: "bold", // Makes text more visible
           
-        }} className= ''label = {"bread"}/>)}
+        }} className= ''label = {ingredient}/>)}
             </div>
 
         </div>

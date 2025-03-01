@@ -1,10 +1,13 @@
 package com.food.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.*;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,13 +24,18 @@ import java.util.List;
 public class Restaurant {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne
     private User owner;
 
     private String name;
+
+    @Override
+    public String toString() {
+        return "Restaurant{id=" + id + ", name='" + name + "', address='" + address + "'}";
+    }
     private String description;
     private String cuisineType;
 
@@ -38,6 +46,8 @@ public class Restaurant {
     private ContactInformation contactInformation;
 
     private String openingHours;
+
+
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders = new ArrayList<>();
@@ -55,4 +65,23 @@ public class Restaurant {
     private List<Food> foods = new ArrayList<>();
 
 
+
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    @JsonIgnore
+    private List<Category> categories;
+
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
+    @JsonIgnore  // ✅ Prevents infinite recursion in JSON response
+    private List<Food> menu;
+
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore  // ✅ Prevents infinite recursion
+    private List<IngredientsCategory> ingredientsCategories;
+
+
 }
+
+
+
+

@@ -8,27 +8,37 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
-@Data
+@Data  // ✅ Generates `getName()` and `setName()` automatically
 @AllArgsConstructor
 @NoArgsConstructor
 public class IngredientsCategory {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    private String name; // ✅ Ensure this field exists
 
-    @JsonIgnore
     @ManyToOne
+    @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
     @JsonIgnore
-    private List<IngredientsItem> ingredientsItemList = new ArrayList<>();
-
-
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<IngredientsItem> ingredientsItemList;
 
 }
+
+
+

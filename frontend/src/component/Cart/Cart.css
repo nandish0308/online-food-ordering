@@ -3,11 +3,11 @@
   }
   
   .custom-textfield .MuiOutlinedInput-root:hover fieldset {
-    border-color: blue;
+    border-color: black;
   }
   
   .custom-textfield .MuiOutlinedInput-root.Mui-focused fieldset {
-    border-color: green;
+    border-color: black;
   }
   
   .custom-textfield .MuiInputLabel-root {
@@ -15,6 +15,6 @@
   }
   
   .custom-textfield .MuiInputBase-input {
-    color: red;
+    color: black;
   }
   

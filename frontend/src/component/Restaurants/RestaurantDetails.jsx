@@ -1,19 +1,15 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Divider , FormControl, FormControlLabel, Grid, RadioGroup, Radio, Typography, Checkbox } from '@mui/material'
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import MenuCard from './MenuCard';
-import { CheckBox } from '@mui/icons-material';
+import { CheckBox, Restaurant } from '@mui/icons-material';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllRestaurantById, getRestaurantCategory } from '../State/Restaurant/Action';
+import {  getMenuItemsByRestaurant } from '../State/Menu/Action';
 
 
-const Category=[
-  "All",
-    "pizza",
-    "Rice",
-    "Biryani",
-    "Chinese",
-    "Burger"
-]
 const foodTypes=[
     {label:"All",value:"all"},
     {label:"Veg only",value:"vegS"},
@@ -25,10 +21,53 @@ const menu=[1,1,1,1,1,1]
 const RestaurantDetails = () => {
 
     const[foodType, setFoodType]=useState("all")
+    const navigate=useNavigate()
+    const dispatch=useDispatch();
+    
+  
+    const jwt=localStorage.getItem("jwt")
+    const {auth,restaurant,menu}= useSelector(store=>store)
+    const [selectedCategory,setselectedCategory]=useState("")
+    const { category } = useSelector(store => store.restaurant);
+
+    console.log("Redux Category State:", category);
+
+
+    const{id,city}=useParams();
+
+
     const handleFilter=(e)=>{
         setFoodType(e.target.value)
         console.log(e.target.value,e.target.name)
     }
+    const handleFilterCategory=(e,value)=>{
+        setselectedCategory(value)
+        console.log(e.target.name,value)
+    }
+    console.log("restaurant",restaurant)
+
+    useEffect(() => {
+      if (jwt && id) {
+          dispatch(getAllRestaurantById({ jwt, restaurantId: id }));
+          dispatch(getRestaurantCategory({ jwt, restaurantId: id }));
+         
+      }
+  }, [jwt, id, dispatch]);
+
+useEffect(()=>{
+dispatch(
+  getMenuItemsByRestaurant({
+    jwt,
+    restaurantId: id,
+    vegetarian: foodType==="vegetarian",
+    seasonal: foodType==="seasonal",
+    nonVeg: foodType==="non_vegetarian",
+    foodCategory: selectedCategory,
+}));
+},[selectedCategory,foodType]);
+  
+    
+    
 
   return (
     <div className='px-5 lg:px-20'>
@@ -40,29 +79,33 @@ const RestaurantDetails = () => {
             <Grid item xs={12} lg={6}>
 
             <img className='w-full h-[40vh] object-cover'
-             src="https://images.pexels.com/photos/1581384/pexels-photo-1581384.jpeg?auto=compress&cs=tinysrgb&w=400"
-              alt=""/>
+ src={restaurant.restaurant?.images?.[0] ?? "https://via.placeholder.com/300"}
+  alt="Restaurant Image"/>
+
             </Grid>
             <Grid item xs={12} lg={6}>
 
             <img className='w-full h-[40vh] object-cover'
-             src="https://images.pexels.com/photos/260922/pexels-photo-260922.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-              alt=""/>
+ src={restaurant.restaurant?.images?.[0] ?? "https://via.placeholder.com/300"}
+  alt="Restaurant Image"/>
+
             </Grid>
         
 
         <Grid item xs={12} lg={6}>
 
 <img className='w-full h-[40vh] object-cover'
- src="https://images.pexels.com/photos/260922/pexels-photo-260922.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-  alt=""/>
+ src={restaurant.restaurant?.images?.[1] ?? "https://via.placeholder.com/300"}
+  alt="Restaurant Image"/>
+
 </Grid>
 
         <Grid item xs={12} lg={6}>
 
 <img className='w-full h-[40vh] object-cover'
- src="https://images.pexels.com/photos/260922/pexels-photo-260922.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-  alt=""/>
+ src={restaurant.restaurant?.images?.[1] ?? "https://via.placeholder.com/300"}
+  alt="Restaurant Image"/>
+
 </Grid>
 
 
@@ -71,11 +114,11 @@ const RestaurantDetails = () => {
 </div>
 
 <div className='pt-3 pb-5'>
-    <h1 className='text-4xl text-black font-semibold'> Foo Palladium Ahmedabad</h1>
+    <h1 className='text-4xl text-black font-semibold'> {restaurant.restaurant?.name}</h1>
     <p className='text-black mt-1'>
         
         
-        Chinese, Sushi, Asian, Japanese, Desserts
+        {restaurant.restaurant?.description}
         </p>
 <div className='space-y-5 mt-5'>
         <p className='text-black flex items-center gap-3'>
@@ -113,7 +156,10 @@ const RestaurantDetails = () => {
           Food Types
             </Typography>
              <FormControl className=' text-black py-10 space-y-5' component={"fieldset"}>
-                <RadioGroup onChange={handleFilter} name='food_type' value={foodType}>
+                <RadioGroup onChange={handleFilterCategory} name='food_Type'
+
+                 value={foodType}
+                 >
 
                 
                       {/* {foodTypes.map((item) => (
@@ -170,44 +216,61 @@ const RestaurantDetails = () => {
         <Typography  className="text-black"variant='h5' sx={{paddingBottom:"1rem"}}> 
           Food Category
             </Typography>
-             <FormControl className=' text-black py-10 space-y-5' component={"fieldset"}>
-                <RadioGroup onChange={handleFilter} name='food_type' value={foodType}>
-
-                
-                      {Category.map((item) => (
-                        <FormControlLabel className='border-black '
-                    key={item}
-                    value={item}
-                    control={<Radio  sx={{
-                      "&.MuiButtonBase-root": {
-                        border: "2px solid black",
-                        margin: "10px",
-                        borderColor: "black", // Proper border inside the radio box
-                        borderRadius: "50%", // Keeps it circular
-                        width: "20px", // Adjust size to fit perfectly
-                        height: "20px",
-                        padding: "2px", // Adjust padding so the border doesn't overflow
-                      },
-                      "&.Mui-checked": {
-                        border: "2px solid black", // Ensures border remains black when selected
-                      },
-                    }} />}
-                    label={item}
-    />
-))}
-
-         
-                </RadioGroup>
-             </FormControl>
+            <FormControl className='text-black py-10 space-y-5' component={"fieldset"}>
+    <RadioGroup onChange={handleFilter} name='food_category' 
+     value={selectedCategory}
+    >
+        {/* ✅ Ensure category is an array before mapping
+        {category && category.length > 0 ? ( */}
+            {restaurant.category.map((item) => (
+                <FormControlLabel
+                    className='border-black'
+                    key={item.id}
+                    value={item.name}
+                    control={
+                        <Radio
+                            sx={{
+                                "&.MuiButtonBase-root": {
+                                    border: "2px solid black",
+                                    margin: "10px",
+                                    borderColor: "black",
+                                    borderRadius: "50%",
+                                    width: "20px",
+                                    height: "20px",
+                                    padding: "2px",
+                                },
+                                "&.Mui-checked": {
+                                    border: "2px solid black",
+                                },
+                            }}
+                        />
+                    }
+                    label={item.name}
+                />
+            ))
+        // ) : (
+        //     <p className="text-black">No categories available</p> // ✅ Fallback message
+        // )}
+          }
+    </RadioGroup>
+</FormControl>
 
     </div>
     </div>
     </div>
 
-    <div className=' text-black space-y-5 lg:w-[80%] lg:pl-10'>
-menu {menu.map((item)=><MenuCard/>)}
-    </div>
+    <div className='text-black space-y-5 lg:w-[80%] lg:pl-10'>
+    {menu.menuItems && menu.menuItems.length > 0 ? (
+        menu.menuItems.map((item) => <MenuCard key={item.id} item={item} />)
+    ) : (
+        <p className="text-black">❌ No menu items available.</p>
+    )}
+</div>
+
 </section>
+
+    
+
 
 
 

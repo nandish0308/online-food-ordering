@@ -29,14 +29,45 @@ public class CategoryController {
         return new ResponseEntity<>(createCategory, HttpStatus.CREATED);
     }
 
-    @GetMapping("/category/restaurant")
-    public ResponseEntity<List<Category>> getRestaurantCategory(
-                                                          @RequestHeader("Authorization") String jwt) throws Exception{
-        User user = userService.findUserByJwtToken(jwt);
+//    @GetMapping("/category/restaurant/{id}")
+//    public ResponseEntity<List<Category>> getRestaurantCategory(
+//            @PathVariable  Long id,
+//                                                          @RequestHeader("Authorization") String jwt) throws Exception{
+//        User user = userService.findUserByJwtToken(jwt);
+//
+//        List<Category> createdCategory = categoryService.findCategoryByRestaurantId(id);
+//        return new ResponseEntity<>(createdCategory, HttpStatus.OK);
+//    }
+//    @GetMapping("/category/restaurant/{id}")
+//    public ResponseEntity<List<Category>> getRestaurantCategory(
+//            @PathVariable Long id,
+//            @RequestHeader("Authorization") String jwt) throws Exception {
+//        User user = userService.findUserByJwtToken(jwt);
+//
+//        List<Category> createdCategory = categoryService.findCategoryByRestaurantId(id);
+//        System.out.println("Fetched Categories: " + createdCategory); // ✅ Debugging
+//
+//        return new ResponseEntity<>(createdCategory, HttpStatus.OK);
+//    }
 
-        List<Category> createdCategory = categoryService.findCategoryByRestaurantId(user.getId());
-        return new ResponseEntity<>(createdCategory, HttpStatus.OK);
+    @GetMapping("/category/restaurant/{id}")
+    public ResponseEntity<List<Category>> getRestaurantCategory(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String jwt) throws Exception {
+        System.out.println("🔍 Fetching Categories for Restaurant ID: " + id);
+        System.out.println("🔍 JWT Token: " + jwt);
+
+        // Verify the user
+        User user = userService.findUserByJwtToken(jwt);
+        System.out.println("✅ User Found: " + user.getEmail());
+
+        // Fetch categories
+        List<Category> categories = categoryService.findCategoryByRestaurantId(id);
+        System.out.println("✅ Fetched Categories: " + categories);
+
+        return new ResponseEntity<>(categories, HttpStatus.OK);
     }
+
 
 
 }

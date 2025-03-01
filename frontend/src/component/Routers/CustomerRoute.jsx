@@ -10,10 +10,10 @@ import Auth from '../Auth/Auth'
 const CustomerRoute = () => {
   return (
     <div>
-        <Navbar/>
+        {/* <Navbar/> */}
         <Routes>
             <Route path='/' element={<Home/>}/>
-            <Route path='/restaurant/:city/:title/:id' element={<RestaurantDetails/>}/>
+            <Route path='/restaurants/:city/:title/:id' element={<RestaurantDetails/>}/>
             <Route path='/cart' element={<Cart/>}/>
             <Route path='/my-profile/*' element={<Profile/>}/>
         </Routes>

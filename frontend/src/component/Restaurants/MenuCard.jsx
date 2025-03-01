@@ -1,7 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Accordion, AccordionDetails, AccordionSummary, Button, Checkbox, FormControlLabel, FormGroup, Typography } from '@mui/material';
 import { CheckBox } from '@mui/icons-material';
+import { object } from 'yup';
+import { CategorizeIngredients } from '../Util/CategorizeIngredients';
+import { useDispatch } from 'react-redux';
+import { addItemToCart } from '../State/Cart/Action';
 const demo=[
   {
     category : "Nuts & seeds",
@@ -14,9 +18,34 @@ const demo=[
   },
 
 ]
-const MenuCard = () => {
-  const handleCheckBoxChange=(value)=>{
+const MenuCard = ({item}) => {
+  const[selectedIngredients,setselectedIngredients]=useState([])
+  const dispatch=useDispatch();
+
+  const handleCheckBoxChange=(itemName)=>{
+    if
+    
+    (selectedIngredients.includes(itemName)){
+      setselectedIngredients(selectedIngredients.filter(item=>item!==itemName))
+    } else{
+      setselectedIngredients([...selectedIngredients,itemName]);
+    }
+  
     console.log("value")
+  };
+  const handleAddItemToCart=(e) =>{
+    e.preventDefault()
+    const reqData ={
+      token:localStorage.getItem("jwt"),
+      cartItem:{
+        foodId:item.id,
+        quantity:1,
+        ingredients:selectedIngredients,
+      },
+    };
+    dispatch(addItemToCart(reqData))
+    console.log(reqData)  
+
   }
   return (
     <Accordion>
@@ -40,17 +69,17 @@ const MenuCard = () => {
       <Typography  className="text-black"component="span">Add Toppings </Typography>
     </AccordionSummary>
     <AccordionDetails>
-     <form >
+     <form onSubmit={handleAddItemToCart}>
       <div className=' text-black flex gap-5 flex-wrap '>
-      {demo.map((item) =>(
+      {Object.keys(CategorizeIngredients(item.ingredients)).map((category) =>(
       <div >
         
-          <p>{item.category}</p>
+          <p>{category}</p>
        
 <FormGroup className='text-black'>
   
-{item.ingedient.map((item)=>(
-  <FormControlLabel className='text-black' control={<Checkbox sx={{
+{CategorizeIngredients(item.ingredients)[category].map((item)=>(
+  <FormControlLabel key={item.id}className='text-black' control={<Checkbox sx={{
   
       "&.MuiButtonBase-root": {
         border: "2px solid black", // Adds a border inside the checkbox
@@ -62,7 +91,8 @@ const MenuCard = () => {
       "&.Mui-checked": {
         borderColor: "black", // Keeps the border black when selected
       },
-  }} onChange={()=>handleCheckBoxChang(item)}/>} label={item} />
+  }} onChange={()=>handleCheckBoxChange(item.name)}/>} 
+  label={item.name} />
 ))}
 
 </FormGroup>
@@ -74,7 +104,7 @@ const MenuCard = () => {
       
       </div>
       <div className=' text-black pt-5'>
-        <Button className='text-black' variant="contained" disabled={false} type="submit">
+        <Button  className='text-black' variant="contained" disabled={false} type="submit">
           {true?"Add to Cart":"Out of Stock"}
 
         </Button>
